@@ -33,3 +33,8 @@ def run_prompt_injection_test():
 def run_all_targets():
 
     return runner.run_all_targets()
+
+@app.post("/run-advanced-prompt-injection-test")
+def run_advanced_prompt_injection_test():
+
+    return runner.run_advanced_prompt_injection_test()

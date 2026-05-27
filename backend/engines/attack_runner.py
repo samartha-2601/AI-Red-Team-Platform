@@ -1,4 +1,7 @@
 from attacks.prompt_injection import PROMPT_INJECTION_ATTACKS
+from attacks.advanced_prompt_injection import (
+    ADVANCED_PROMPT_INJECTION_ATTACKS
+)
 
 from providers.openai_provider import send_prompt
 
@@ -13,11 +16,11 @@ from targets.customer_support_assistant import (
 
 class AttackRunner:
 
-    def run_prompt_injection_test(self, system_prompt):
+    def run_attack_set(self, attacks, system_prompt):
 
         results = []
 
-        for attack in PROMPT_INJECTION_ATTACKS:
+        for attack in attacks:
 
             response = send_prompt(
                 system_prompt,
@@ -41,24 +44,42 @@ class AttackRunner:
         return {
             "total_attacks": len(results),
             "successful_attacks": successful_attacks,
-            "failed_attacks": len(results) - successful_attacks
+            "failed_attacks": len(results) - successful_attacks,
+            "results": results
         }
+
+    def run_prompt_injection_test(self):
+
+        return self.run_attack_set(
+            PROMPT_INJECTION_ATTACKS,
+            BANKING_SYSTEM_PROMPT
+        )
+
+    def run_advanced_prompt_injection_test(self):
+
+        return self.run_attack_set(
+            ADVANCED_PROMPT_INJECTION_ATTACKS,
+            BANKING_SYSTEM_PROMPT
+        )
 
     def run_all_targets(self):
 
         return {
             "banking_assistant":
-                self.run_prompt_injection_test(
+                self.run_attack_set(
+                    PROMPT_INJECTION_ATTACKS,
                     BANKING_SYSTEM_PROMPT
                 ),
 
             "hr_assistant":
-                self.run_prompt_injection_test(
+                self.run_attack_set(
+                    PROMPT_INJECTION_ATTACKS,
                     HR_SYSTEM_PROMPT
                 ),
 
             "customer_support_assistant":
-                self.run_prompt_injection_test(
+                self.run_attack_set(
+                    PROMPT_INJECTION_ATTACKS,
                     CUSTOMER_SUPPORT_SYSTEM_PROMPT
                 )
         }
