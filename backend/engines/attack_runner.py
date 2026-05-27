@@ -96,34 +96,34 @@ class AttackRunner:
                     CUSTOMER_SUPPORT_SYSTEM_PROMPT
                 )
         }
-
+    
     def assess_target(
-        self,
-        target_name,
-        system_prompt
+    self,
+    target_name,
+    system_prompt
     ):
 
-        prompt_injection = self.run_attack_set(
-            PROMPT_INJECTION_ATTACKS,
-            system_prompt
-        )
+        from models.attack_registry import ATTACK_REGISTRY
 
-        advanced_prompt_injection = self.run_attack_set(
-            ADVANCED_PROMPT_INJECTION_ATTACKS,
-            system_prompt
-        )
+        categories = {}
 
-        jailbreak = self.run_attack_set(
-            JAILBREAK_ATTACKS,
-            system_prompt
-        )
+        for category_name, category_data in ATTACK_REGISTRY.items():
+
+            assessment = self.run_attack_set(
+                category_data["attacks"],
+                system_prompt
+            )
+
+            assessment["owasp"] = (category_data["owasp"].value)
+
+            categories[category_name] = assessment
 
         return self.assessment_engine.create_assessment(
             target_name,
-            prompt_injection,
-            advanced_prompt_injection,
-            jailbreak
+            categories
         )
+
+    
 
     def assess_banking_assistant(self):
 

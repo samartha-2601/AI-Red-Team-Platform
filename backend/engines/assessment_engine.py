@@ -6,16 +6,8 @@ class AssessmentEngine:
     def create_assessment(
         self,
         target_name,
-        prompt_injection,
-        advanced_prompt_injection,
-        jailbreak
+        categories
     ):
-
-        categories = {
-            "prompt_injection": prompt_injection,
-            "advanced_prompt_injection": advanced_prompt_injection,
-            "jailbreak": jailbreak
-        }
 
         total_successful = sum(
             category["successful_attacks"]
