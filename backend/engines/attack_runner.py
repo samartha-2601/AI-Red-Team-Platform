@@ -2,6 +2,7 @@ from attacks.prompt_injection import PROMPT_INJECTION_ATTACKS
 from attacks.advanced_prompt_injection import (
     ADVANCED_PROMPT_INJECTION_ATTACKS
 )
+from attacks.jailbreak import JAILBREAK_ATTACKS
 
 from providers.openai_provider import send_prompt
 
@@ -13,10 +14,13 @@ from targets.customer_support_assistant import (
     CUSTOMER_SUPPORT_SYSTEM_PROMPT
 )
 
-from attacks.jailbreak import JAILBREAK_ATTACKS
+from engines.assessment_engine import AssessmentEngine
 
 
 class AttackRunner:
+
+    def __init__(self):
+        self.assessment_engine = AssessmentEngine()
 
     def run_attack_set(self, attacks, system_prompt):
 
@@ -64,6 +68,13 @@ class AttackRunner:
             BANKING_SYSTEM_PROMPT
         )
 
+    def run_jailbreak_test(self):
+
+        return self.run_attack_set(
+            JAILBREAK_ATTACKS,
+            BANKING_SYSTEM_PROMPT
+        )
+
     def run_all_targets(self):
 
         return {
@@ -85,10 +96,52 @@ class AttackRunner:
                     CUSTOMER_SUPPORT_SYSTEM_PROMPT
                 )
         }
-    
-    def run_jailbreak_test(self):
 
-        return self.run_attack_set(
+    def assess_target(
+        self,
+        target_name,
+        system_prompt
+    ):
+
+        prompt_injection = self.run_attack_set(
+            PROMPT_INJECTION_ATTACKS,
+            system_prompt
+        )
+
+        advanced_prompt_injection = self.run_attack_set(
+            ADVANCED_PROMPT_INJECTION_ATTACKS,
+            system_prompt
+        )
+
+        jailbreak = self.run_attack_set(
             JAILBREAK_ATTACKS,
+            system_prompt
+        )
+
+        return self.assessment_engine.create_assessment(
+            target_name,
+            prompt_injection,
+            advanced_prompt_injection,
+            jailbreak
+        )
+
+    def assess_banking_assistant(self):
+
+        return self.assess_target(
+            "banking_assistant",
             BANKING_SYSTEM_PROMPT
+        )
+
+    def assess_hr_assistant(self):
+
+        return self.assess_target(
+            "hr_assistant",
+            HR_SYSTEM_PROMPT
+        )
+
+    def assess_customer_support_assistant(self):
+
+        return self.assess_target(
+            "customer_support_assistant",
+            CUSTOMER_SUPPORT_SYSTEM_PROMPT
         )

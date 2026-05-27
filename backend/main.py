@@ -2,6 +2,8 @@ from fastapi import FastAPI
 
 from engines.attack_runner import AttackRunner
 
+from targets.banking_assistant import BANKING_SYSTEM_PROMPT
+
 app = FastAPI(
     title="AI Red Team Platform",
     version="0.1.0"
@@ -43,3 +45,8 @@ def run_advanced_prompt_injection_test():
 def run_jailbreak_test():
 
     return runner.run_jailbreak_test()
+
+@app.post("/assess-banking-assistant")
+def assess_banking_assistant():
+
+    return runner.assess_banking_assistant()
