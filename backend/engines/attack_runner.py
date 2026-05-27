@@ -13,6 +13,8 @@ from targets.customer_support_assistant import (
     CUSTOMER_SUPPORT_SYSTEM_PROMPT
 )
 
+from attacks.jailbreak import JAILBREAK_ATTACKS
+
 
 class AttackRunner:
 
@@ -83,3 +85,10 @@ class AttackRunner:
                     CUSTOMER_SUPPORT_SYSTEM_PROMPT
                 )
         }
+    
+    def run_jailbreak_test(self):
+
+        return self.run_attack_set(
+            JAILBREAK_ATTACKS,
+            BANKING_SYSTEM_PROMPT
+        )

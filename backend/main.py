@@ -38,3 +38,8 @@ def run_all_targets():
 def run_advanced_prompt_injection_test():
 
     return runner.run_advanced_prompt_injection_test()
+
+@app.post("/run-jailbreak-test")
+def run_jailbreak_test():
+
+    return runner.run_jailbreak_test()
