@@ -4,7 +4,7 @@ from attacks.advanced_prompt_injection import (
 )
 from attacks.jailbreak import JAILBREAK_ATTACKS
 
-from providers.openai_provider import send_prompt
+
 
 from scoring.prompt_injection_scorer import evaluate_attack
 
@@ -19,8 +19,13 @@ from engines.assessment_engine import AssessmentEngine
 
 class AttackRunner:
 
-    def __init__(self):
-        self.assessment_engine = AssessmentEngine()
+    def __init__(self, provider):
+
+        self.provider = provider
+
+        self.assessment_engine = (
+            AssessmentEngine()
+        )
 
     def run_attack_set(self, attacks, system_prompt):
 
@@ -28,7 +33,7 @@ class AttackRunner:
 
         for attack in attacks:
 
-            response = send_prompt(
+            response = self.provider.send_prompt(
                 system_prompt,
                 attack
             )

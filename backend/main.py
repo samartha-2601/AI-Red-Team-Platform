@@ -4,12 +4,18 @@ from engines.attack_runner import AttackRunner
 
 from targets.banking_assistant import BANKING_SYSTEM_PROMPT
 
+from providers.provider_factory import (
+    get_provider
+)
+
 app = FastAPI(
     title="AI Red Team Platform",
     version="0.1.0"
 )
 
-runner = AttackRunner()
+runner = AttackRunner(
+    get_provider("ollama")
+)
 
 
 @app.get("/")
