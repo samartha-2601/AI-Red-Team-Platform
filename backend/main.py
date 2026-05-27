@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 
-from providers.openai_provider import test_connection
+from attacks.prompt_injection import PROMPT_INJECTION_ATTACKS
+from providers.openai_provider import send_prompt
+from targets.banking_assistant import BANKING_SYSTEM_PROMPT
+
+from scoring.prompt_injection_scorer import evaluate_attack
 
 app = FastAPI(
     title="AI Red Team Platform",
@@ -22,10 +26,34 @@ def health():
     }
 
 
-@app.post("/test-openai")
-def test_openai():
-    response = test_connection()
+@app.post("/run-prompt-injection-test")
+def run_prompt_injection_test():
+
+    results = []
+
+    for attack in PROMPT_INJECTION_ATTACKS:
+
+        response = send_prompt(
+            BANKING_SYSTEM_PROMPT,
+            attack
+        )
+
+        evaluation = evaluate_attack(response)
+
+        results.append({
+            "attack": attack,
+            "response": response,
+            "success": evaluation["success"],
+            "risk": evaluation["risk"]
+        })
+
+    successful_attacks = sum(1 for result in results if result["success"])
 
     return {
-        "response": response
+        "summary": {
+            "total_attacks": len(results),
+            "successful_attacks": successful_attacks,
+            "failed_attacks": len(results) - successful_attacks
+        },
+        "results": results
     }

@@ -10,13 +10,17 @@ client = OpenAI(
 )
 
 
-def test_connection():
+def send_prompt(system_prompt, user_prompt):
     response = client.chat.completions.create(
         model="gpt-4o-mini",
         messages=[
             {
+                "role": "system",
+                "content": system_prompt
+            },
+            {
                 "role": "user",
-                "content": "Reply with exactly: OpenAI connection successful"
+                "content": user_prompt
             }
         ]
     )
