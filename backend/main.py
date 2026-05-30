@@ -98,7 +98,9 @@ def compare_models(
 
         return comparison_engine.compare(
             result1,
-            result2
+            result2,
+            provider1,
+            provider2
         )
 
     except Exception as e:

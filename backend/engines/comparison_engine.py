@@ -1,62 +1,131 @@
 class ComparisonEngine:
 
-    def compare(
+    def calculate_category_score(
         self,
-        openai_result,
-        ollama_result
+        category_result
     ):
 
-        openai_score = (
-            openai_result["overall_score"]
+        total_attacks = (
+            category_result["total_attacks"]
         )
 
-        ollama_score = (
-            ollama_result["overall_score"]
+        successful_attacks = (
+            category_result[
+                "successful_attacks"
+            ]
         )
 
-        if openai_score < ollama_score:
+        if total_attacks == 0:
+            return 0
 
-            more_secure = "openai"
+        return round(
+            (
+                successful_attacks
+                / total_attacks
+            ) * 100,
+            2
+        )
 
-        elif ollama_score < openai_score:
+    def compare(
+        self,
+        result1,
+        result2,
+        provider1="provider1",
+        provider2="provider2"
+    ):
 
-            more_secure = "ollama"
+        score1 = result1[
+            "overall_score"
+        ]
+
+        score2 = result2[
+            "overall_score"
+        ]
+
+        if score1 < score2:
+
+            winner = provider1
+
+        elif score2 < score1:
+
+            winner = provider2
 
         else:
 
-            more_secure = "tie"
+            winner = "tie"
+
+        category_comparison = {}
+
+        for category_name in (
+            result1["categories"]
+        ):
+
+            category1 = (
+                result1["categories"]
+                [category_name]
+            )
+
+            category2 = (
+                result2["categories"]
+                [category_name]
+            )
+
+            category_comparison[
+                category_name
+            ] = {
+
+                provider1:
+                    self
+                    .calculate_category_score(
+                        category1
+                    ),
+
+                provider2:
+                    self
+                    .calculate_category_score(
+                        category2
+                    ),
+
+                "owasp":
+                    category1["owasp"]
+            }
 
         return {
 
-            "openai": {
-                "overall_score":
-                    openai_score,
+            "target":
+                result1["target"],
 
-                "overall_rating":
-                    openai_result[
-                        "overall_rating"
-                    ]
-            },
+            "overall_comparison": {
 
-            "ollama": {
-                "overall_score":
-                    ollama_score,
+                provider1: {
+                    "score":
+                        score1,
 
-                "overall_rating":
-                    ollama_result[
-                        "overall_rating"
-                    ]
-            },
+                    "rating":
+                        result1[
+                            "overall_rating"
+                        ]
+                },
 
-            "comparison": {
+                provider2: {
+                    "score":
+                        score2,
 
-                "more_secure_model":
-                    more_secure,
+                    "rating":
+                        result2[
+                            "overall_rating"
+                        ]
+                },
+
+                "winner":
+                    winner,
 
                 "score_difference":
                     abs(
-                        openai_score -
-                        ollama_score
+                        score1 - score2
                     )
-            }
+            },
+
+            "category_comparison":
+                category_comparison
         }
