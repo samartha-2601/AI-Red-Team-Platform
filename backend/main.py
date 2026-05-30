@@ -1,12 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from engines.attack_runner import AttackRunner
-
-from targets.banking_assistant import BANKING_SYSTEM_PROMPT
-
-from providers.provider_factory import (
-    get_provider
-)
 
 from providers.provider_factory import (
     get_provider
@@ -18,16 +12,13 @@ from engines.comparison_engine import (
 
 app = FastAPI(
     title="AI Red Team Platform",
-    version="0.1.0"
-)
-
-runner = AttackRunner(
-    get_provider("ollama")
+    version="0.2.0"
 )
 
 
 @app.get("/")
 def root():
+
     return {
         "message": "AI Red Team Platform API"
     }
@@ -35,62 +26,84 @@ def root():
 
 @app.get("/health")
 def health():
+
     return {
         "status": "ok"
     }
 
 
-@app.post("/run-prompt-injection-test")
-def run_prompt_injection_test():
+@app.post("/assess/{provider}/{target}")
+def assess_provider_target(
+    provider: str,
+    target: str
+):
 
-    return runner.run_prompt_injection_test()
+    try:
 
-@app.post("/run-all-targets")
-def run_all_targets():
+        runner = AttackRunner(
+            get_provider(provider)
+        )
 
-    return runner.run_all_targets()
+        return (
+            runner
+            .assess_target_by_name(
+                target
+            )
+        )
 
-@app.post("/run-advanced-prompt-injection-test")
-def run_advanced_prompt_injection_test():
+    except Exception as e:
 
-    return runner.run_advanced_prompt_injection_test()
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
 
-@app.post("/run-jailbreak-test")
-def run_jailbreak_test():
 
-    return runner.run_jailbreak_test()
+@app.post(
+    "/compare/{provider1}/{provider2}/{target}"
+)
+def compare_models(
+    provider1: str,
+    provider2: str,
+    target: str
+):
 
-@app.post("/assess-banking-assistant")
-def assess_banking_assistant():
+    try:
 
-    return runner.assess_banking_assistant()
+        runner1 = AttackRunner(
+            get_provider(provider1)
+        )
 
-@app.post("/compare-models")
-def compare_models():
+        runner2 = AttackRunner(
+            get_provider(provider2)
+        )
 
-    openai_runner = AttackRunner(
-        get_provider("openai")
-    )
+        result1 = (
+            runner1
+            .assess_target_by_name(
+                target
+            )
+        )
 
-    ollama_runner = AttackRunner(
-        get_provider("ollama")
-    )
+        result2 = (
+            runner2
+            .assess_target_by_name(
+                target
+            )
+        )
 
-    openai_result = (
-        openai_runner
-        .assess_banking_assistant()
-    )
+        comparison_engine = (
+            ComparisonEngine()
+        )
 
-    ollama_result = (
-        ollama_runner
-        .assess_banking_assistant()
-    )
+        return comparison_engine.compare(
+            result1,
+            result2
+        )
 
-    comparison_engine = (
-        ComparisonEngine()
-    )
+    except Exception as e:
 
-    return comparison_engine.compare(
-        openai_result,
-        ollama_result
-    )
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )

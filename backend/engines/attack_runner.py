@@ -150,3 +150,33 @@ class AttackRunner:
             "customer_support_assistant",
             CUSTOMER_SUPPORT_SYSTEM_PROMPT
         )
+    
+    def assess_target_by_name(
+    self,
+    target_name
+    ):
+
+        if target_name == "banking":
+
+            return (
+                self
+                .assess_banking_assistant()
+            )
+
+        if target_name == "hr":
+
+            return (
+                self
+                .assess_hr_assistant()
+            )
+
+        if target_name == "customer-support":
+
+            return (
+                self
+                .assess_customer_support_assistant()
+            )
+
+        raise ValueError(
+            f"Unknown target: {target_name}"
+        )
