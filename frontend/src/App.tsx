@@ -43,87 +43,85 @@ function App() {
 
   return (
 
-    <div
-      style={{
-        padding: "40px",
-        fontFamily: "Arial"
-      }}
-    >
+    <div className="container">
 
-      <h1>
+      <h1 className="title">
         AI Red Team Platform
       </h1>
 
       <br />
 
-      <label>
-        Provider:
-      </label>
+      <div className="form-section">
 
-      <br />
+        <label>
+          Provider:
+        </label>
 
-      <select
-        value={provider}
-        onChange={(e) =>
-          setProvider(e.target.value)
-        }
-      >
+        <br />
 
-        <option value="openai">
-          OpenAI
-        </option>
+        <select
+          value={provider}
+          onChange={(e) =>
+            setProvider(e.target.value)
+          }
+        >
 
-        <option value="ollama">
-          Ollama
-        </option>
+          <option value="openai">
+            OpenAI
+          </option>
 
-      </select>
+          <option value="ollama">
+            Ollama
+          </option>
 
-      <br />
-      <br />
+        </select>
 
-      <label>
-        Target:
-      </label>
+        <br />
+        <br />
 
-      <br />
+        <label>
+          Target:
+        </label>
 
-      <select
-        value={target}
-        onChange={(e) =>
-          setTarget(e.target.value)
-        }
-      >
+        <br />
 
-        <option value="banking">
-          Banking
-        </option>
+        <select
+          value={target}
+          onChange={(e) =>
+            setTarget(e.target.value)
+          }
+        >
 
-        <option value="hr">
-          HR
-        </option>
+          <option value="banking">
+            Banking
+          </option>
 
-        <option value="customer-support">
-          Customer Support
-        </option>
+          <option value="hr">
+            HR
+          </option>
 
-      </select>
+          <option value="customer-support">
+            Customer Support
+          </option>
 
-      <br />
-      <br />
+        </select>
 
-      <button
-        onClick={runAssessment}
-        disabled={loading}
-      >
+        <br />
+        <br />
 
-        {
-          loading
-            ? "Running Assessment..."
-            : "Run Assessment"
-        }
+        <button
+          onClick={runAssessment}
+          disabled={loading}
+        >
 
-      </button>
+          {
+            loading
+              ? "Running Assessment..."
+              : "Run Assessment"
+          }
+
+        </button>
+      </div>
 
       <br />
       <br />
@@ -150,35 +148,81 @@ function App() {
       {
         result && (
 
-          <div>
+          <>
 
-            <h2>
-              Assessment Result
-            </h2>
+            <div className="cards">
 
-            <p>
-              Overall Score:
-              {" "}
-              {result.overall_score}
-            </p>
+              <div className="card">
 
-            <p>
-              Overall Rating:
-              {" "}
-              {result.overall_rating}
-            </p>
+                <h3>
+                  Overall Score
+                </h3>
 
-            <pre>
+                <div className="card-value">
+                  {result.overall_score}
+                </div>
+
+              </div>
+
+              <div className="card">
+
+                <h3>
+                  Risk Rating
+                </h3>
+
+                <div
+                  className={`card-value ${result.overall_rating.toLowerCase()}`}
+                >
+                  {result.overall_rating}
+                </div>
+
+              </div>
+
+            </div>
+
+            <div className="category-table">
+
+              <h2>
+                Attack Categories
+              </h2>
+
               {
-                JSON.stringify(
-                  result,
-                  null,
-                  2
+
+                Object.entries(
+                  result.categories
+                ).map(
+                  ([name, category]: any) => {
+
+                    const score =
+                      (
+                        category.successful_attacks /
+                        category.total_attacks
+                      ) * 100;
+
+                    return (
+
+                      <div
+                        key={name}
+                        className="category-row"
+                      >
+
+                        <span>
+                          {name}
+                        </span>
+
+                        <span>
+                          {score.toFixed(0)}%
+                        </span>
+
+                      </div>
+                    );
+                  }
                 )
               }
-            </pre>
 
-          </div>
+            </div>
+
+          </>
         )
       }
 
