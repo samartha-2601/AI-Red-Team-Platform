@@ -1,5 +1,7 @@
 from fastapi import FastAPI, HTTPException
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from engines.attack_runner import AttackRunner
 
 from providers.provider_factory import (
@@ -13,6 +15,16 @@ from engines.comparison_engine import (
 app = FastAPI(
     title="AI Red Team Platform",
     version="0.2.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
